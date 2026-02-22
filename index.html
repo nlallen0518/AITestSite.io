@@ -11,33 +11,34 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
 </head>
 <body>
 
-    <!-- Fixed cinematic layers -->
+    <!-- ═══ LOADER ═══ -->
+    <div class="loader" id="loader">
+        <div class="loader-inner">
+            <svg class="loader-bean" viewBox="0 0 60 80" fill="none">
+                <ellipse cx="30" cy="40" rx="24" ry="34" fill="#3d2814"/>
+                <path d="M30 12 C28 25, 22 35, 30 40 C38 35, 32 25, 30 12Z" fill="#2a1a0a" opacity="0.5"/>
+                <ellipse cx="30" cy="40" rx="24" ry="34" fill="none" stroke="#d4a55a" stroke-width="1" opacity="0.3"/>
+            </svg>
+            <p class="loader-text">Urban Coffee House</p>
+            <div class="loader-bar"><span class="loader-bar-fill" id="loaderFill"></span></div>
+        </div>
+    </div>
+
+    <!-- ═══ FIXED CINEMATIC LAYERS ═══ -->
     <canvas id="bgCanvas" aria-hidden="true"></canvas>
+    <canvas id="ambientCanvas" aria-hidden="true"></canvas>
     <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
     <div class="vignette" aria-hidden="true"></div>
     <div class="grain" aria-hidden="true"></div>
 
-    <!-- Cinematic letterbox bars -->
+    <!-- Letterbox bars -->
     <div class="letterbox letterbox-top" aria-hidden="true"></div>
     <div class="letterbox letterbox-bot" aria-hidden="true"></div>
-
-    <!-- Depth warp tunnel -->
-    <div class="warp-tunnel" id="warpTunnel" aria-hidden="true">
-        <div class="warp-ring wr-1"></div>
-        <div class="warp-ring wr-2"></div>
-        <div class="warp-ring wr-3"></div>
-        <div class="warp-ring wr-4"></div>
-    </div>
-
-    <!-- Light rays -->
-    <div class="light-rays" id="lightRays" aria-hidden="true">
-        <div class="ray ray-1"></div>
-        <div class="ray ray-2"></div>
-        <div class="ray ray-3"></div>
-    </div>
 
     <!-- Cursor -->
     <div class="cursor-dot" aria-hidden="true"></div>
@@ -45,7 +46,7 @@
 
     <!-- Journey progress -->
     <div class="journey-bar" aria-hidden="true">
-        <span class="journey-bar-fill" id="journeyBarFill"></span>
+        <span class="journey-fill" id="journeyFill"></span>
     </div>
 
     <!-- Stage nav -->
@@ -60,67 +61,60 @@
     </nav>
 
     <!-- Stage title flash -->
-    <div class="stage-title-flash" id="stageTitleFlash" aria-hidden="true">
-        <span class="stf-label" id="stfLabel"></span>
+    <div class="stage-flash" id="stageFlash" aria-hidden="true">
+        <span class="stage-flash-text" id="stageFlashText"></span>
     </div>
 
-    <!-- ═════════════════════ JOURNEY ═════════════════════ -->
+    <!-- ═══════════════════ JOURNEY ═══════════════════ -->
     <main class="journey" id="journey">
 
-        <!-- ─── S0: ORIGIN ─── -->
-        <section class="stage stage-origin" id="stage0" data-stage="0">
-            <div class="scene scene-origin" id="sceneOrigin">
-                <canvas class="mountain-canvas" id="mountainCanvas" aria-hidden="true"></canvas>
-                <canvas class="stars-canvas" id="starsCanvas" aria-hidden="true"></canvas>
-                <div class="cherry-portal" id="cherryPortal">
-                    <div class="cherry-shell cherry-l"></div>
-                    <div class="cherry-shell cherry-r"></div>
-                    <div class="cherry-bean" id="cherryBean"></div>
-                </div>
-                <div class="float-beans" id="floatBeans"></div>
+        <!-- ──── S0: ORIGIN ──── -->
+        <section class="stage" id="stage0" data-stage="0">
+            <div class="stage-visual">
+                <canvas id="originCanvas" aria-hidden="true"></canvas>
             </div>
-
             <div class="stage-content">
-                <div class="content-block origin-hero">
-                    <p class="eyebrow gs-reveal">From the Highlands</p>
-                    <h1 class="headline-hero gs-reveal">Urban<br>Coffee<br>House</h1>
-                    <p class="body-lead gs-reveal">Every cup begins as a cherry on a branch, 1,800 meters above sea level. Scroll to follow the journey — from origin to your table.</p>
-                    <div class="scroll-cue gs-reveal">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        <span>Scroll to descend</span>
+                <div class="content-block hero-block">
+                    <p class="eyebrow gs-up">Chapter One</p>
+                    <h1 class="hero-title">
+                        <span class="title-line">Urban</span>
+                        <span class="title-line">Coffee</span>
+                        <span class="title-line">House</span>
+                    </h1>
+                    <p class="body-lead gs-up">Every cup begins as a cherry on a branch, 1,800&nbsp;meters above sea level. Scroll to follow the journey&nbsp;&mdash; from origin to your&nbsp;table.</p>
+                    <div class="scroll-cue gs-up">
+                        <div class="scroll-cue-icon"><span></span></div>
+                        <span>Begin the descent</span>
                     </div>
                 </div>
                 <div class="content-block">
-                    <div class="stat-row gs-reveal">
-                        <div class="stat"><span class="stat-num" data-count="6">0</span><span class="stat-lbl">Origin Countries</span></div>
-                        <div class="stat"><span class="stat-num" data-count="14">0</span><span class="stat-lbl">Partner Farms</span></div>
-                        <div class="stat"><span class="stat-num-text">1800m+</span><span class="stat-lbl">Altitude</span></div>
+                    <div class="stat-row gs-stagger">
+                        <div class="stat"><span class="stat-num" data-count="6">0</span><span class="stat-label">Origin Countries</span></div>
+                        <div class="stat"><span class="stat-num" data-count="14">0</span><span class="stat-label">Partner Farms</span></div>
+                        <div class="stat"><span class="stat-num-text">1800m+</span><span class="stat-label">Altitude</span></div>
                     </div>
-                    <p class="body-text gs-reveal">We partner with farms across Ethiopia, Colombia, Guatemala, Japan, Kenya, and Brazil — paying above market, visiting annually, learning always.</p>
+                    <p class="body-text gs-up">We partner with farms across Ethiopia, Colombia, Guatemala, Japan, Kenya, and Brazil&nbsp;&mdash; paying above market, visiting annually, learning&nbsp;always.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ─── S1: ROAST ─── -->
-        <section class="stage stage-roast" id="stage1" data-stage="1">
-            <div class="scene scene-roast" id="sceneRoast">
-                <div class="drum-interior" id="drumInterior">
-                    <div class="drum-ring dr-1"></div>
-                    <div class="drum-ring dr-2"></div>
-                    <div class="drum-ring dr-3"></div>
-                    <div class="drum-ring dr-4"></div>
-                    <div class="drum-ring dr-5"></div>
+        <!-- ──── S1: ROAST ──── -->
+        <section class="stage" id="stage1" data-stage="1">
+            <div class="stage-visual">
+                <div class="roast-scene">
+                    <div class="roast-bean" id="roastBean"></div>
+                    <div class="heat-ring hr-1"></div>
+                    <div class="heat-ring hr-2"></div>
+                    <div class="heat-ring hr-3"></div>
+                    <div class="heat-ring hr-4"></div>
+                    <div class="heat-ring hr-5"></div>
                 </div>
-                <div class="roast-bean" id="roastBean"></div>
-                <div class="heat-glow" id="heatGlow"></div>
-                <canvas class="heat-canvas" id="heatCanvas" aria-hidden="true"></canvas>
             </div>
-
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">Transformation</p>
-                    <h2 class="headline-lg gs-reveal">The Roast</h2>
-                    <p class="body-lead gs-reveal">You're inside the drum. At 200&deg;C, sugars caramelize, acids develop, and over 800 aromatic compounds form. Watch the bean transform — green to golden to deep espresso brown.</p>
+                    <p class="eyebrow gs-up">Chapter Two</p>
+                    <h2 class="section-title gs-up">The Roast</h2>
+                    <p class="body-lead gs-up">Inside the drum at 200&deg;C. Sugars caramelize, acids develop, and over 800 aromatic compounds ignite. Watch the bean transform&nbsp;&mdash; green to golden to deep espresso&nbsp;brown.</p>
                 </div>
                 <div class="content-block">
                     <div class="card-row gs-stagger">
@@ -128,42 +122,42 @@
                         <article class="glass-card"><h3>Medium Roast</h3><p>Balanced sweetness, caramel body. Our house espresso profile.</p></article>
                         <article class="glass-card"><h3>Dark Roast</h3><p>Bold, chocolatey, low acidity. Ideal for milk drinks and cold brew.</p></article>
                     </div>
-                    <blockquote class="quote gs-reveal">
-                        <p>"Roasting is listening. The beans crack, change color, tell you when they're ready."</p>
-                        <cite>— Alex Chen, Head Roaster</cite>
+                    <blockquote class="quote gs-up">
+                        <p>&ldquo;Roasting is listening. The beans crack, change color, tell you when they&rsquo;re ready.&rdquo;</p>
+                        <cite>&mdash; Alex Chen, Head Roaster</cite>
                     </blockquote>
                 </div>
             </div>
         </section>
 
-        <!-- ─── S2: GRIND ─── -->
-        <section class="stage stage-grind" id="stage2" data-stage="2">
-            <div class="scene scene-grind" id="sceneGrind">
-                <svg class="blade-ring" id="bladeRing" viewBox="0 0 400 400" aria-hidden="true">
-                    <g id="bladeSet">
-                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)"/>
-                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(45 200 200)"/>
-                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(90 200 200)"/>
-                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(135 200 200)"/>
-                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)"/>
-                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(45 200 200)"/>
-                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(90 200 200)"/>
-                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(135 200 200)"/>
-                        <circle cx="200" cy="200" r="25" fill="none" stroke="rgba(200,215,255,0.2)" stroke-width="2.5"/>
-                    </g>
-                </svg>
-                <div class="grind-flash" id="grindFlash"></div>
+        <!-- ──── S2: GRIND ──── -->
+        <section class="stage" id="stage2" data-stage="2">
+            <div class="stage-visual">
+                <div class="grind-scene">
+                    <svg class="grind-blades" id="grindBlades" viewBox="0 0 400 400" aria-hidden="true">
+                        <g id="bladeGroup">
+                            <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)"/>
+                            <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(45 200 200)"/>
+                            <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(90 200 200)"/>
+                            <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(135 200 200)"/>
+                            <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)"/>
+                            <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(45 200 200)"/>
+                            <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(90 200 200)"/>
+                            <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(135 200 200)"/>
+                            <circle cx="200" cy="200" r="25" fill="none" stroke="rgba(200,215,255,0.2)" stroke-width="2.5"/>
+                        </g>
+                    </svg>
+                </div>
             </div>
-
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">Precision</p>
-                    <h2 class="headline-lg gs-reveal">The Grind</h2>
-                    <p class="body-lead gs-reveal">The blades close in. Grind size determines everything — too coarse and water rushes through, too fine and bitterness takes over. We calibrate every morning.</p>
+                    <p class="eyebrow gs-up">Chapter Three</p>
+                    <h2 class="section-title gs-up">The Grind</h2>
+                    <p class="body-lead gs-up">The blades close in. Grind size determines everything&nbsp;&mdash; too coarse and water rushes through, too fine and bitterness takes over. We calibrate every&nbsp;morning.</p>
                 </div>
                 <div class="content-block">
                     <div class="card-row gs-stagger">
-                        <article class="glass-card"><h3>Espresso</h3><p>Fine like powdered sugar. 9 bars pressure. 25-second pull.</p></article>
+                        <article class="glass-card"><h3>Espresso</h3><p>Fine like powdered sugar. 9&nbsp;bars pressure. 25-second pull.</p></article>
                         <article class="glass-card"><h3>Pour Over</h3><p>Medium like sea salt. Gravity-fed. 3.5-minute bloom.</p></article>
                         <article class="glass-card"><h3>Cold Brew</h3><p>Coarse like raw sugar. 12-hour immersion. Zero heat.</p></article>
                     </div>
@@ -171,134 +165,139 @@
             </div>
         </section>
 
-        <!-- ─── S3: EXTRACT ─── -->
-        <section class="stage stage-extract" id="stage3" data-stage="3">
-            <div class="scene scene-extract" id="sceneExtract">
-                <div class="pf-group" id="pfGroup">
-                    <div class="pf-body"></div>
-                    <div class="pf-spout"></div>
-                    <div class="pf-handle"></div>
+        <!-- ──── S3: EXTRACT / MENU ──── -->
+        <section class="stage" id="stage3" data-stage="3">
+            <div class="stage-visual">
+                <div class="extract-scene">
+                    <div class="portafilter" id="portafilter">
+                        <div class="pf-body"></div>
+                        <div class="pf-spout"></div>
+                        <div class="pf-handle"></div>
+                    </div>
+                    <div class="espresso-stream" id="espressoStream"></div>
+                    <div class="drip-pool" id="dripPool"></div>
                 </div>
-                <div class="espresso-stream" id="espressoStream"></div>
-                <div class="drip-pool" id="dripPool"></div>
             </div>
-
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">Signature Collection</p>
-                    <h2 class="headline-lg gs-reveal">The Menu</h2>
+                    <p class="eyebrow gs-up">The Collection</p>
+                    <h2 class="section-title gs-up">The Menu</h2>
                 </div>
                 <div class="content-block">
-                    <h3 class="menu-cat gs-reveal">Drinks</h3>
+                    <h3 class="menu-category gs-up">Drinks</h3>
                     <div class="menu-grid" id="menuDrinks"></div>
                 </div>
                 <div class="content-block">
-                    <h3 class="menu-cat gs-reveal">Kitchen</h3>
+                    <h3 class="menu-category gs-up">Kitchen</h3>
                     <div class="menu-grid" id="menuFood"></div>
-                    <p class="menu-note gs-reveal">Menu rotates seasonally. Ask about this week's featured single-origin.</p>
+                    <p class="menu-note gs-up">Menu rotates seasonally. Ask about this week&rsquo;s featured single-origin.</p>
                 </div>
             </div>
         </section>
 
-        <!-- ─── S4: POUR ─── -->
-        <section class="stage stage-pour" id="stage4" data-stage="4">
-            <div class="scene scene-pour" id="scenePour">
-                <div class="cup-3d" id="cup3d">
-                    <div class="cup-rim"></div>
-                    <div class="cup-liquid"></div>
-                    <svg class="latte-art" id="latteArt" viewBox="0 0 200 200">
-                        <path class="rosetta" id="rosettaPath" d="
-                            M100,168 C100,168 84,152 80,138 C76,124 79,114 89,109
-                            C99,104 100,114 100,114 C100,114 101,104 111,109
-                            C121,114 124,124 120,138 C116,152 100,168 100,168Z
-                            M100,109 C100,109 88,99 85,89 C82,79 86,73 93,71
-                            C100,69 100,77 100,77 C100,77 100,69 107,71
-                            C114,73 118,79 115,89 C112,99 100,109 100,109Z
-                            M100,77 C100,77 93,69 92,61 C91,53 95,49 100,48
-                            C105,49 109,53 108,61 C107,69 100,77 100,77Z
-                            M100,48 L100,32
-                        " fill="none" stroke="rgba(255,248,235,0.8)" stroke-width="2.5" stroke-linecap="round"/>
-                    </svg>
+        <!-- ──── S4: POUR ──── -->
+        <section class="stage" id="stage4" data-stage="4">
+            <div class="stage-visual">
+                <div class="pour-scene">
+                    <div class="cup-topdown" id="cupTopdown">
+                        <div class="cup-rim-circle"></div>
+                        <div class="cup-liquid"></div>
+                        <svg class="latte-art" viewBox="0 0 200 200">
+                            <path id="rosettaPath"
+                                d="M100,168 C100,168 84,152 80,138 C76,124 79,114 89,109
+                                   C99,104 100,114 100,114 C100,114 101,104 111,109
+                                   C121,114 124,124 120,138 C116,152 100,168 100,168Z
+                                   M100,109 C100,109 88,99 85,89 C82,79 86,73 93,71
+                                   C100,69 100,77 100,77 C100,77 100,69 107,71
+                                   C114,73 118,79 115,89 C112,99 100,109 100,109Z
+                                   M100,77 C100,77 93,69 92,61 C91,53 95,49 100,48
+                                   C105,49 109,53 108,61 C107,69 100,77 100,77Z
+                                   M100,48 L100,32"
+                                fill="none" stroke="rgba(255,248,235,0.8)"
+                                stroke-width="2.5" stroke-linecap="round"
+                                stroke-dasharray="700" stroke-dashoffset="700"/>
+                        </svg>
+                    </div>
+                    <div class="milk-stream" id="milkStream"></div>
                 </div>
-                <div class="milk-pour" id="milkPour"></div>
             </div>
-
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">The Craft</p>
-                    <h2 class="headline-lg gs-reveal">The Pour</h2>
-                    <p class="body-lead gs-reveal">You're looking down into the cup. The milk enters — micro-foam at exactly 60&deg;C — and the rosetta forms. It's proof this cup was made with care.</p>
+                    <p class="eyebrow gs-up">Chapter Five</p>
+                    <h2 class="section-title gs-up">The Pour</h2>
+                    <p class="body-lead gs-up">Looking down into the cup. Micro-foam at exactly 60&deg;C enters and the rosetta forms. Proof that this cup was made with&nbsp;care.</p>
                 </div>
                 <div class="content-block">
                     <div class="card-row card-row-2 gs-stagger">
-                        <article class="glass-card"><h3>Milk Science</h3><p>Steam to 60&deg;C — the sweet spot where lactose breaks into simple sugars. Any hotter and proteins denature.</p></article>
-                        <article class="glass-card"><h3>Plant Alternatives</h3><p>Oat, almond, coconut — each steamed differently. Full micro-foam on every option.</p></article>
+                        <article class="glass-card"><h3>Milk Science</h3><p>Steam to 60&deg;C&nbsp;&mdash; the sweet spot where lactose breaks into simple sugars. Any hotter and proteins denature.</p></article>
+                        <article class="glass-card"><h3>Plant Alternatives</h3><p>Oat, almond, coconut&nbsp;&mdash; each steamed differently. Full micro-foam on every option.</p></article>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- ─── S5: ATMOSPHERE ─── -->
-        <section class="stage stage-atmosphere" id="stage5" data-stage="5">
-            <div class="scene scene-atmosphere" id="sceneAtmo">
-                <div class="reveal-frame" id="revealFrame">
-                    <div class="gallery-mosaic">
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=900&auto=format&fit=crop')"></div>
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=900&auto=format&fit=crop')"></div>
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=900&auto=format&fit=crop')"></div>
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=900&auto=format&fit=crop')"></div>
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=900&auto=format&fit=crop')"></div>
-                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=900&auto=format&fit=crop')"></div>
+        <!-- ──── S5: ATMOSPHERE ──── -->
+        <section class="stage" id="stage5" data-stage="5">
+            <div class="stage-visual">
+                <div class="atmo-scene">
+                    <div class="gallery-reveal" id="galleryReveal">
+                        <div class="gallery-grid">
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=900&auto=format&fit=crop')"></div>
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=900&auto=format&fit=crop')"></div>
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=900&auto=format&fit=crop')"></div>
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=900&auto=format&fit=crop')"></div>
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=900&auto=format&fit=crop')"></div>
+                            <div class="gallery-img" style="background-image:url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=900&auto=format&fit=crop')"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">The Space</p>
-                    <h2 class="headline-lg gs-reveal">More than a caf&eacute;</h2>
-                    <p class="body-lead gs-reveal">The cup opens up and you're here — concrete floors, walnut counters, morning light flooding the bar. Every detail exists to slow you down.</p>
-                    <blockquote class="quote gs-reveal">
-                        <p>"The space was designed to feel like a pause — somewhere between a gallery and a living room."</p>
-                        <cite>— Mira Patel, Interior Architect</cite>
+                    <p class="eyebrow gs-up">The Space</p>
+                    <h2 class="section-title gs-up">More than a caf&eacute;</h2>
+                    <p class="body-lead gs-up">The cup opens up and you&rsquo;re here&nbsp;&mdash; concrete floors, walnut counters, morning light flooding the bar. Every detail exists to slow you&nbsp;down.</p>
+                    <blockquote class="quote gs-up">
+                        <p>&ldquo;The space was designed to feel like a pause&nbsp;&mdash; somewhere between a gallery and a living room.&rdquo;</p>
+                        <cite>&mdash; Mira Patel, Interior Architect</cite>
                     </blockquote>
                 </div>
             </div>
         </section>
 
-        <!-- ─── S6: THE TABLE ─── -->
-        <section class="stage stage-table" id="stage6" data-stage="6">
+        <!-- ──── S6: THE TABLE ──── -->
+        <section class="stage stage-final" id="stage6" data-stage="6">
             <div class="stage-content">
                 <div class="content-block">
-                    <p class="eyebrow gs-reveal">You Made It</p>
-                    <h2 class="headline-lg gs-reveal">The Table</h2>
-                    <p class="body-lead gs-reveal">From cherry to cup, you've seen every step. Now pull up a chair.</p>
+                    <p class="eyebrow gs-up">You Made It</p>
+                    <h2 class="section-title gs-up">The Table</h2>
+                    <p class="body-lead gs-up">From cherry to cup, you&rsquo;ve seen every step. Now pull up a&nbsp;chair.</p>
                 </div>
                 <div class="content-block">
-                    <div class="table-grid gs-reveal">
+                    <div class="table-grid gs-up">
                         <div class="visit-info">
-                            <div class="info-block"><h4>Location</h4><p>48 Lexington Row, Downtown District</p></div>
-                            <div class="info-block"><h4>Contact</h4><p>+1 (415) 555-0174<br>hello@urbancoffeehouse.com</p></div>
-                            <div class="info-block"><h4>Hours</h4><p>Mon — Fri 7 AM – 10 PM<br>Sat 8 AM – 11:30 PM<br>Sun 8 AM – 9 PM</p></div>
+                            <div class="info-item"><h4>Location</h4><p>48 Lexington Row, Downtown District</p></div>
+                            <div class="info-item"><h4>Contact</h4><p>+1 (415) 555-0174<br>hello@urbancoffeehouse.com</p></div>
+                            <div class="info-item"><h4>Hours</h4><p>Mon — Fri 7 AM – 10 PM<br>Sat 8 AM – 11:30 PM<br>Sun 8 AM – 9 PM</p></div>
                         </div>
-                        <form class="reserve-form" id="reservationForm" novalidate>
-                            <h3>Reserve a table</h3>
+                        <form class="reserve-form" id="reserveForm" novalidate>
+                            <h3>Reserve a Table</h3>
                             <label>Name <input type="text" name="name" required placeholder="Your name"></label>
                             <label>Email <input type="email" name="email" required placeholder="you@email.com"></label>
                             <label>Guests <input type="number" name="guests" min="1" max="12" required placeholder="1-12"></label>
                             <label>Date <input type="date" name="date" required></label>
                             <button type="submit" class="btn-reserve">Confirm Reservation</button>
-                            <p class="form-msg" id="formMessage" aria-live="polite"></p>
+                            <p class="form-msg" id="formMsg" aria-live="polite"></p>
                         </form>
                     </div>
                 </div>
                 <div class="content-block">
                     <div class="faq-row gs-stagger">
-                        <div class="glass-card faq"><h4>Walk-ins?</h4><p>Always welcome. Reservations guarantee seating during peak.</p></div>
-                        <div class="glass-card faq"><h4>Wi-Fi?</h4><p>Fast and free. Laptop-friendly after 2 PM weekdays.</p></div>
-                        <div class="glass-card faq"><h4>Beans to go?</h4><p>Every origin available in 250g bags. Ground to your method.</p></div>
+                        <div class="glass-card"><h4>Walk-ins?</h4><p>Always welcome. Reservations guarantee seating during peak.</p></div>
+                        <div class="glass-card"><h4>Wi-Fi?</h4><p>Fast and free. Laptop-friendly after 2 PM weekdays.</p></div>
+                        <div class="glass-card"><h4>Beans to go?</h4><p>Every origin available in 250g bags. Ground to your method.</p></div>
                     </div>
-                    <p class="closing gs-reveal">See you at the bar. &#10022;</p>
+                    <p class="closing gs-up">See you at the bar. &#10022;</p>
                 </div>
             </div>
         </section>
