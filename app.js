@@ -25,6 +25,9 @@
     const $ = (s, p = document) => p.querySelector(s);
     const $$ = (s, p = document) => [...p.querySelectorAll(s)];
 
+    /* ── CMS data (loaded from localStorage, falls back to defaults) ── */
+    const cmsData = (typeof CMS !== "undefined") ? CMS.load() : null;
+
     /* ── DOM refs ── */
     const body = document.body;
     const loader = $("#loader");
@@ -538,14 +541,14 @@
        MENU DATA + RENDER
        ═══════════════════════════════════════════════════ */
 
-    const drinks = [
+    const drinks = cmsData ? cmsData.drinks : [
         { name: "Midnight Espresso", price: "$4.50", desc: "Double ristretto. Dark cherry, raw cacao. No milk needed.", img: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?q=80&w=500&auto=format&fit=crop" },
         { name: "Velvet Latte", price: "$5.80", desc: "House espresso, oat milk micro-foam, vanilla bean.", img: "https://images.unsplash.com/photo-1534778101976-62847782c213?q=80&w=500&auto=format&fit=crop" },
         { name: "Kyoto Cold Brew", price: "$6.30", desc: "12-hour immersion. Ethiopian Yirgacheffe. Black as midnight.", img: "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?q=80&w=500&auto=format&fit=crop" },
         { name: "Pour Over Flight", price: "$8.90", desc: "Three origins. Three methods. One journey.", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=500&auto=format&fit=crop" },
     ];
 
-    const food = [
+    const food = cmsData ? cmsData.food : [
         { name: "Truffle Mushroom Toast", price: "$11.50", desc: "Sourdough, wild mushrooms, truffle oil, micro greens.", img: "https://images.unsplash.com/photo-1484723091739-30a097e8f929?q=80&w=500&auto=format&fit=crop" },
         { name: "Maple Chilli Croissant", price: "$7.20", desc: "Laminated butter, smoked maple glaze, Aleppo pepper.", img: "https://images.unsplash.com/photo-1555507036-ab1f4038024a?q=80&w=500&auto=format&fit=crop" },
         { name: "Citrus Ricotta Pancakes", price: "$10.80", desc: "Fluffy, lemon zest, blueberry compote, powdered sugar.", img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=500&auto=format&fit=crop" },
@@ -563,6 +566,112 @@
         if (fg) fg.innerHTML = food.map(cardHTML).join("");
     }
     renderMenu();
+
+    /* ═══════════════════════════════════════════════════
+       CMS CONTENT INJECTION
+       Injects CMS-managed text into data-cms elements.
+       Falls back to hardcoded HTML if CMS is not loaded.
+       ═══════════════════════════════════════════════════ */
+
+    function injectCMSContent() {
+        if (!cmsData) return;
+        const d = cmsData;
+
+        // Helper: set text content of an element by selector
+        function setText(sel, val) {
+            const el = $(sel);
+            if (el && val !== undefined) el.innerHTML = val;
+        }
+
+        /* — Business Info (Table section) — */
+        setText("[data-cms='location']", d.business.location);
+        setText("[data-cms='phone']", d.business.phone);
+        setText("[data-cms='email']", d.business.email);
+        setText("[data-cms='hours']",
+            d.business.hours.weekday + "<br>" +
+            d.business.hours.saturday + "<br>" +
+            d.business.hours.sunday
+        );
+
+        /* — Stats — */
+        const statCountry = $("[data-cms='stat-countries']");
+        if (statCountry) { statCountry.dataset.count = d.stats.countries; statCountry.textContent = "0"; }
+        const statFarms = $("[data-cms='stat-farms']");
+        if (statFarms) { statFarms.dataset.count = d.stats.farms; statFarms.textContent = "0"; }
+        setText("[data-cms='stat-altitude']", d.stats.altitude);
+
+        /* — Section Text — */
+        const sectionMap = {
+            origin: "#stage0",
+            roast: "#stage1",
+            grind: "#stage2",
+            extract: "#stage3",
+            pour: "#stage4",
+            atmosphere: "#stage5",
+            table: "#stage6",
+        };
+        for (const [key, sel] of Object.entries(sectionMap)) {
+            const sec = d.sections[key];
+            if (!sec) continue;
+            const stage = $(sel);
+            if (!stage) continue;
+            const eyebrow = $("[data-cms='" + key + "-eyebrow']", stage);
+            const title = $("[data-cms='" + key + "-title']", stage);
+            const lead = $("[data-cms='" + key + "-lead']", stage);
+            const body = $("[data-cms='" + key + "-body']", stage);
+            if (eyebrow && sec.eyebrow) eyebrow.innerHTML = sec.eyebrow;
+            if (title && sec.title) title.innerHTML = sec.title;
+            if (lead && sec.lead) lead.innerHTML = sec.lead;
+            if (body && sec.body) body.innerHTML = sec.body;
+        }
+
+        /* — Closing text — */
+        setText("[data-cms='closing']", d.sections.table.closing);
+
+        /* — Menu note — */
+        setText("[data-cms='menu-note']", d.menuNote);
+
+        /* — Quotes — */
+        d.quotes.forEach(q => {
+            const sectionSel = sectionMap[q.section];
+            if (!sectionSel) return;
+            const stage = $(sectionSel);
+            if (!stage) return;
+            const quote = $("blockquote.quote", stage);
+            if (quote) {
+                const p = $("p", quote);
+                const cite = $("cite", quote);
+                if (p) p.innerHTML = "\u201c" + q.text + "\u201d";
+                if (cite) cite.innerHTML = "\u2014 " + q.cite;
+            }
+        });
+
+        /* — Info Cards — */
+        function renderCardGroup(sel, cards, heading) {
+            const container = $(sel);
+            if (!container || !cards) return;
+            const tag = heading || "h3";
+            container.innerHTML = cards.map(c =>
+                `<article class="glass-card"><${tag}>${c.title}</${tag}><p>${c.body}</p></article>`
+            ).join("");
+        }
+        renderCardGroup("[data-cms='roast-cards']", d.roastCards);
+        renderCardGroup("[data-cms='grind-cards']", d.grindCards);
+        renderCardGroup("[data-cms='pour-cards']", d.pourCards);
+        renderCardGroup("[data-cms='faq-cards']", d.faqCards, "h4");
+
+        /* — Gallery images — */
+        const galleryGrid = $(".gallery-grid");
+        if (galleryGrid && d.gallery) {
+            galleryGrid.innerHTML = d.gallery.map(url =>
+                `<div class="gallery-img" style="background-image:url('${url}')"></div>`
+            ).join("");
+        }
+
+        /* — Footer copyright — */
+        setText("[data-cms='footer']", "\u00a9 2026 " + d.business.name);
+    }
+    injectCMSContent();
 
     /* ═══════════════════════════════════════════════════
        GSAP SCROLL TRIGGERS
@@ -910,8 +1019,8 @@
 
         ScrollTrigger.create({
             trigger: stage,
-            start: "top 85%",
-            end: "top 15%",
+            start: "top 95%",
+            end: "top -10%",
             scrub: 1,
             onUpdate: self => {
                 const p = self.progress;
@@ -927,16 +1036,18 @@
         if (!stageFlash || !stageFlashText) return;
         stageFlashText.textContent = stageNames[i] || "";
         gsap.timeline()
-            .set(stageFlash, { opacity: 1 })
+            .set(stageFlash, { opacity: 0 })
+            .to(stageFlash, { opacity: 1, duration: 0.3, ease: "power2.out" })
             .fromTo(stageFlashText,
-                { opacity: 0, scale: 1.8, filter: "blur(20px)" },
-                { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.45, ease: "power3.out" }
+                { opacity: 0, scale: 2.2, filter: "blur(30px)", letterSpacing: "0.3em" },
+                { opacity: 1, scale: 1, filter: "blur(0px)", letterSpacing: "0.06em", duration: 0.6, ease: "power3.out" },
+                0.05
             )
             .to(stageFlashText, {
-                opacity: 0, scale: 0.85, filter: "blur(8px)",
-                duration: 0.35, ease: "power2.in",
-            }, "+=0.25")
-            .set(stageFlash, { opacity: 0 });
+                opacity: 0, scale: 0.8, filter: "blur(12px)",
+                duration: 0.45, ease: "power2.in",
+            }, "+=0.9")
+            .to(stageFlash, { opacity: 0, duration: 0.25, ease: "power2.in" }, "-=0.2");
     }
 
     /* ═══════════════════════════════════════════════════

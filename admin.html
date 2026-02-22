@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Urban Coffee House</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <script src="cms.js"></script>
+</head>
+<body>
+
+    <!-- ═══ LOGIN GATE ═══ -->
+    <div class="login-gate" id="loginGate">
+        <div class="login-card">
+            <div class="login-logo">☕</div>
+            <h1>Urban Coffee House</h1>
+            <p>Content Management</p>
+            <form id="loginForm">
+                <input type="password" id="loginPass" placeholder="Enter admin password" autocomplete="current-password" required>
+                <button type="submit">Sign In</button>
+                <p class="login-error" id="loginError"></p>
+            </form>
+            <p class="login-hint">Default password: <code>coffee2026</code></p>
+        </div>
+    </div>
+
+    <!-- ═══ ADMIN PANEL ═══ -->
+    <div class="admin-panel" id="adminPanel" style="display:none">
+
+        <!-- Top bar -->
+        <header class="admin-header">
+            <div class="admin-header-left">
+                <span class="admin-logo">☕</span>
+                <h1>CMS</h1>
+            </div>
+            <div class="admin-header-right">
+                <button class="btn-outline" id="btnPreview" title="Preview site">👁 Preview</button>
+                <button class="btn-outline" id="btnResetAll" title="Reset to defaults">↺ Reset All</button>
+                <button class="btn-primary" id="btnSaveAll">💾 Save Changes</button>
+                <button class="btn-ghost" id="btnLogout" title="Log out">⎋</button>
+            </div>
+        </header>
+
+        <!-- Toast -->
+        <div class="toast" id="toast"></div>
+
+        <!-- Sidebar + Content -->
+        <div class="admin-layout">
+            <nav class="admin-sidebar" id="sidebar">
+                <a href="#sec-business" class="nav-link active" data-section="sec-business">🏪 Business Info</a>
+                <a href="#sec-menu" class="nav-link" data-section="sec-menu">☕ Menu</a>
+                <a href="#sec-sections" class="nav-link" data-section="sec-sections">📝 Section Text</a>
+                <a href="#sec-quotes" class="nav-link" data-section="sec-quotes">💬 Quotes</a>
+                <a href="#sec-cards" class="nav-link" data-section="sec-cards">🃏 Info Cards</a>
+                <a href="#sec-gallery" class="nav-link" data-section="sec-gallery">🖼 Gallery</a>
+                <a href="#sec-password" class="nav-link" data-section="sec-password">🔑 Password</a>
+            </nav>
+
+            <main class="admin-main" id="adminMain">
+
+                <!-- ════ BUSINESS INFO ════ -->
+                <section class="cms-section" id="sec-business">
+                    <h2>Business Info</h2>
+                    <p class="section-desc">Location, contact details, and opening hours.</p>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Business Name</span>
+                            <input type="text" data-path="business.name">
+                        </label>
+                        <label class="field">
+                            <span>Tagline</span>
+                            <input type="text" data-path="business.tagline">
+                        </label>
+                        <label class="field full">
+                            <span>Location</span>
+                            <input type="text" data-path="business.location">
+                        </label>
+                        <label class="field">
+                            <span>Phone</span>
+                            <input type="text" data-path="business.phone">
+                        </label>
+                        <label class="field">
+                            <span>Email</span>
+                            <input type="email" data-path="business.email">
+                        </label>
+                        <label class="field">
+                            <span>Hours — Weekday</span>
+                            <input type="text" data-path="business.hours.weekday">
+                        </label>
+                        <label class="field">
+                            <span>Hours — Saturday</span>
+                            <input type="text" data-path="business.hours.saturday">
+                        </label>
+                        <label class="field">
+                            <span>Hours — Sunday</span>
+                            <input type="text" data-path="business.hours.sunday">
+                        </label>
+                    </div>
+
+                    <h3>Origin Stats</h3>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Origin Countries</span>
+                            <input type="number" data-path="stats.countries" min="0">
+                        </label>
+                        <label class="field">
+                            <span>Partner Farms</span>
+                            <input type="number" data-path="stats.farms" min="0">
+                        </label>
+                        <label class="field">
+                            <span>Altitude Text</span>
+                            <input type="text" data-path="stats.altitude">
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ════ MENU ════ -->
+                <section class="cms-section" id="sec-menu">
+                    <h2>Menu</h2>
+                    <p class="section-desc">Manage drinks and food items shown in the Extract section.</p>
+
+                    <div class="menu-editor">
+                        <div class="menu-category-block">
+                            <div class="category-header">
+                                <h3>Drinks</h3>
+                                <button class="btn-small btn-add" data-add="drinks">+ Add Drink</button>
+                            </div>
+                            <div class="item-list" id="drinksList"></div>
+                        </div>
+
+                        <div class="menu-category-block">
+                            <div class="category-header">
+                                <h3>Food</h3>
+                                <button class="btn-small btn-add" data-add="food">+ Add Item</button>
+                            </div>
+                            <div class="item-list" id="foodList"></div>
+                        </div>
+
+                        <label class="field full">
+                            <span>Menu Note</span>
+                            <input type="text" data-path="menuNote">
+                        </label>
+                    </div>
+                </section>
+
+                <!-- ════ SECTION TEXT ════ -->
+                <section class="cms-section" id="sec-sections">
+                    <h2>Section Text</h2>
+                    <p class="section-desc">Edit the eyebrow labels, titles, and body copy for each journey section.</p>
+                    <div id="sectionEditors"></div>
+                </section>
+
+                <!-- ════ QUOTES ════ -->
+                <section class="cms-section" id="sec-quotes">
+                    <h2>Quotes</h2>
+                    <p class="section-desc">Blockquotes shown within sections.</p>
+                    <div id="quotesList"></div>
+                    <button class="btn-small btn-add" id="addQuote">+ Add Quote</button>
+                </section>
+
+                <!-- ════ INFO CARDS ════ -->
+                <section class="cms-section" id="sec-cards">
+                    <h2>Info Cards</h2>
+                    <p class="section-desc">The glass-card groups in each section.</p>
+                    <div id="cardsEditor"></div>
+                </section>
+
+                <!-- ════ GALLERY ════ -->
+                <section class="cms-section" id="sec-gallery">
+                    <h2>Gallery Images</h2>
+                    <p class="section-desc">Six images shown in the Atmosphere section. Paste image URLs.</p>
+                    <div id="galleryList"></div>
+                </section>
+
+                <!-- ════ PASSWORD ════ -->
+                <section class="cms-section" id="sec-password">
+                    <h2>Change Password</h2>
+                    <p class="section-desc">Update the admin panel password.</p>
+                    <div class="form-grid">
+                        <label class="field">
+                            <span>Current Password</span>
+                            <input type="password" id="oldPass">
+                        </label>
+                        <label class="field">
+                            <span>New Password</span>
+                            <input type="password" id="newPass">
+                        </label>
+                        <label class="field">
+                            <span>Confirm New Password</span>
+                            <input type="password" id="confirmPass">
+                        </label>
+                    </div>
+                    <button class="btn-primary" id="btnChangePass" style="margin-top:1rem">Update Password</button>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+    (() => {
+        /* ═══ HELPERS ═══ */
+        const $ = s => document.querySelector(s);
+        const $$ = s => [...document.querySelectorAll(s)];
+
+        let data = CMS.load();
+        let dirty = false;
+
+        function markDirty() { dirty = true; }
+
+        function toast(msg, type = "success") {
+            const el = $("#toast");
+            el.textContent = msg;
+            el.className = "toast show " + type;
+            setTimeout(() => el.classList.remove("show"), 3000);
+        }
+
+        /** Get a nested value from obj by dot-path */
+        function getPath(obj, path) {
+            return path.split(".").reduce((o, k) => (o && o[k] !== undefined ? o[k] : ""), obj);
+        }
+        /** Set a nested value */
+        function setPath(obj, path, val) {
+            const keys = path.split(".");
+            let cur = obj;
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (!cur[keys[i]]) cur[keys[i]] = {};
+                cur = cur[keys[i]];
+            }
+            cur[keys[keys.length - 1]] = val;
+        }
+
+        /* ═══ LOGIN ═══ */
+        const loginGate = $("#loginGate");
+        const adminPanel = $("#adminPanel");
+
+        $("#loginForm").addEventListener("submit", e => {
+            e.preventDefault();
+            const pass = $("#loginPass").value;
+            if (CMS.checkPassword(pass)) {
+                loginGate.style.display = "none";
+                adminPanel.style.display = "";
+                initAdmin();
+            } else {
+                $("#loginError").textContent = "Incorrect password.";
+                $("#loginPass").value = "";
+            }
+        });
+
+        /* ═══ INIT ADMIN ═══ */
+        function initAdmin() {
+            bindSimpleFields();
+            renderMenu();
+            renderSections();
+            renderQuotes();
+            renderCards();
+            renderGallery();
+            setupNav();
+        }
+
+        /* ═══ SIDEBAR NAV ═══ */
+        function setupNav() {
+            $$(".nav-link").forEach(link => {
+                link.addEventListener("click", e => {
+                    e.preventDefault();
+                    $$(".nav-link").forEach(l => l.classList.remove("active"));
+                    link.classList.add("active");
+                    const target = document.getElementById(link.dataset.section);
+                    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+                });
+            });
+        }
+
+        /* ═══ SIMPLE FIELDS (data-path) ═══ */
+        function bindSimpleFields() {
+            $$("[data-path]").forEach(input => {
+                const path = input.dataset.path;
+                const val = getPath(data, path);
+                input.value = val ?? "";
+                input.addEventListener("input", () => {
+                    let v = input.value;
+                    if (input.type === "number") v = parseInt(v) || 0;
+                    setPath(data, path, v);
+                    markDirty();
+                });
+            });
+        }
+
+        /* ═══ MENU ITEMS ═══ */
+        function menuItemHTML(item, category, idx) {
+            return `
+            <div class="item-card" data-category="${category}" data-idx="${idx}">
+                <img class="item-thumb" src="${item.img}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23222%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23555%22 font-size=%2214%22>No img</text></svg>'">
+                <div class="item-fields">
+                    <input type="text" value="${esc(item.name)}" placeholder="Name" data-field="name">
+                    <input type="text" value="${esc(item.price)}" placeholder="Price" data-field="price">
+                    <input type="text" value="${esc(item.desc)}" placeholder="Description" data-field="desc">
+                    <input type="url" value="${esc(item.img)}" placeholder="Image URL" data-field="img">
+                </div>
+                <button class="btn-delete" title="Remove item">✕</button>
+            </div>`;
+        }
+
+        function esc(str) { return (str || "").replace(/"/g, "&quot;"); }
+
+        function renderMenu() {
+            const dl = $("#drinksList");
+            const fl = $("#foodList");
+            dl.innerHTML = data.drinks.map((d, i) => menuItemHTML(d, "drinks", i)).join("");
+            fl.innerHTML = data.food.map((f, i) => menuItemHTML(f, "food", i)).join("");
+
+            // Bind events
+            [dl, fl].forEach(list => {
+                list.addEventListener("input", e => {
+                    const card = e.target.closest(".item-card");
+                    if (!card) return;
+                    const cat = card.dataset.category;
+                    const idx = parseInt(card.dataset.idx);
+                    const field = e.target.dataset.field;
+                    if (field) {
+                        data[cat][idx][field] = e.target.value;
+                        if (field === "img") {
+                            card.querySelector(".item-thumb").src = e.target.value;
+                        }
+                        markDirty();
+                    }
+                });
+                list.addEventListener("click", e => {
+                    if (e.target.classList.contains("btn-delete")) {
+                        const card = e.target.closest(".item-card");
+                        const cat = card.dataset.category;
+                        const idx = parseInt(card.dataset.idx);
+                        data[cat].splice(idx, 1);
+                        markDirty();
+                        renderMenu();
+                    }
+                });
+            });
+
+            // Add buttons
+            $$("[data-add]").forEach(btn => {
+                btn.onclick = () => {
+                    const cat = btn.dataset.add;
+                    data[cat].push({ name: "", price: "", desc: "", img: "" });
+                    markDirty();
+                    renderMenu();
+                };
+            });
+        }
+
+        /* ═══ SECTION TEXT ═══ */
+        function renderSections() {
+            const container = $("#sectionEditors");
+            const sectionNames = ["origin", "roast", "grind", "extract", "pour", "atmosphere", "table"];
+            const labels = { origin: "Origin", roast: "Roast", grind: "Grind", extract: "Extract / Menu", pour: "Pour", atmosphere: "Atmosphere", table: "The Table" };
+
+            container.innerHTML = sectionNames.map(name => {
+                const sec = data.sections[name];
+                const fields = Object.keys(sec).map(key => {
+                    const val = sec[key] || "";
+                    const isLong = key === "lead" || key === "body" || key === "closing";
+                    return `
+                    <label class="field ${isLong ? "full" : ""}">
+                        <span>${capitalize(key)}</span>
+                        ${isLong
+                            ? `<textarea data-sec="${name}" data-key="${key}" rows="3">${esc(val)}</textarea>`
+                            : `<input type="text" data-sec="${name}" data-key="${key}" value="${esc(val)}">`
+                        }
+                    </label>`;
+                }).join("");
+
+                return `<div class="subsection"><h3>${labels[name]}</h3><div class="form-grid">${fields}</div></div>`;
+            }).join("");
+
+            container.addEventListener("input", e => {
+                const sec = e.target.dataset.sec;
+                const key = e.target.dataset.key;
+                if (sec && key) {
+                    data.sections[sec][key] = e.target.value;
+                    markDirty();
+                }
+            });
+        }
+
+        function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+        /* ═══ QUOTES ═══ */
+        function renderQuotes() {
+            const container = $("#quotesList");
+            container.innerHTML = data.quotes.map((q, i) => `
+                <div class="quote-card" data-idx="${i}">
+                    <label class="field full"><span>Quote Text</span><textarea data-field="text" rows="2">${esc(q.text)}</textarea></label>
+                    <div class="form-grid">
+                        <label class="field"><span>Attribution</span><input type="text" data-field="cite" value="${esc(q.cite)}"></label>
+                        <label class="field"><span>Section</span>
+                            <select data-field="section">
+                                <option value="origin" ${q.section==="origin"?"selected":""}>Origin</option>
+                                <option value="roast" ${q.section==="roast"?"selected":""}>Roast</option>
+                                <option value="grind" ${q.section==="grind"?"selected":""}>Grind</option>
+                                <option value="extract" ${q.section==="extract"?"selected":""}>Extract</option>
+                                <option value="pour" ${q.section==="pour"?"selected":""}>Pour</option>
+                                <option value="atmosphere" ${q.section==="atmosphere"?"selected":""}>Atmosphere</option>
+                                <option value="table" ${q.section==="table"?"selected":""}>Table</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button class="btn-delete" data-del-quote="${i}">✕ Remove</button>
+                </div>
+            `).join("");
+
+            container.addEventListener("input", e => {
+                const card = e.target.closest(".quote-card");
+                if (!card) return;
+                const idx = parseInt(card.dataset.idx);
+                const field = e.target.dataset.field;
+                if (field) { data.quotes[idx][field] = e.target.value; markDirty(); }
+            });
+            container.addEventListener("click", e => {
+                if (e.target.dataset.delQuote !== undefined) {
+                    data.quotes.splice(parseInt(e.target.dataset.delQuote), 1);
+                    markDirty(); renderQuotes();
+                }
+            });
+
+            $("#addQuote").onclick = () => {
+                data.quotes.push({ text: "", cite: "", section: "roast" });
+                markDirty(); renderQuotes();
+            };
+        }
+
+        /* ═══ INFO CARDS ═══ */
+        function renderCards() {
+            const container = $("#cardsEditor");
+            const groups = [
+                { key: "roastCards", label: "Roast Cards" },
+                { key: "grindCards", label: "Grind Cards" },
+                { key: "pourCards", label: "Pour Cards" },
+                { key: "faqCards", label: "FAQ Cards" },
+            ];
+
+            container.innerHTML = groups.map(g => {
+                const cards = data[g.key] || [];
+                const cardsHTML = cards.map((c, i) => `
+                    <div class="mini-card" data-group="${g.key}" data-idx="${i}">
+                        <input type="text" value="${esc(c.title)}" placeholder="Title" data-field="title">
+                        <textarea rows="2" placeholder="Body text" data-field="body">${esc(c.body)}</textarea>
+                        <button class="btn-delete-sm" data-del-card>✕</button>
+                    </div>
+                `).join("");
+
+                return `<div class="subsection"><div class="category-header"><h3>${g.label}</h3><button class="btn-small btn-add" data-add-card="${g.key}">+ Add</button></div>${cardsHTML}</div>`;
+            }).join("");
+
+            container.addEventListener("input", e => {
+                const mc = e.target.closest(".mini-card");
+                if (!mc) return;
+                const group = mc.dataset.group;
+                const idx = parseInt(mc.dataset.idx);
+                const field = e.target.dataset.field;
+                if (field) { data[group][idx][field] = e.target.value; markDirty(); }
+            });
+            container.addEventListener("click", e => {
+                if (e.target.dataset.delCard !== undefined) {
+                    const mc = e.target.closest(".mini-card");
+                    data[mc.dataset.group].splice(parseInt(mc.dataset.idx), 1);
+                    markDirty(); renderCards();
+                }
+                if (e.target.dataset.addCard) {
+                    data[e.target.dataset.addCard].push({ title: "", body: "" });
+                    markDirty(); renderCards();
+                }
+            });
+        }
+
+        /* ═══ GALLERY ═══ */
+        function renderGallery() {
+            const container = $("#galleryList");
+            container.innerHTML = data.gallery.map((url, i) => `
+                <div class="gallery-item">
+                    <img src="${url}" alt="" class="gallery-thumb" onerror="this.style.display='none'">
+                    <input type="url" value="${esc(url)}" placeholder="Image URL" data-gal-idx="${i}">
+                </div>
+            `).join("");
+
+            container.addEventListener("input", e => {
+                const idx = e.target.dataset.galIdx;
+                if (idx !== undefined) {
+                    data.gallery[parseInt(idx)] = e.target.value;
+                    const thumb = e.target.previousElementSibling;
+                    if (thumb) { thumb.src = e.target.value; thumb.style.display = ""; }
+                    markDirty();
+                }
+            });
+        }
+
+        /* ═══ TOP BAR ACTIONS ═══ */
+        $("#btnSaveAll").addEventListener("click", () => {
+            if (CMS.save(data)) {
+                dirty = false;
+                toast("All changes saved!");
+            } else {
+                toast("Save failed — check console.", "error");
+            }
+        });
+
+        $("#btnResetAll").addEventListener("click", () => {
+            if (!confirm("Reset ALL content back to defaults? This cannot be undone.")) return;
+            CMS.reset();
+            data = CMS.load();
+            dirty = false;
+            // Re-render everything
+            bindSimpleFields();
+            renderMenu();
+            renderSections();
+            renderQuotes();
+            renderCards();
+            renderGallery();
+            toast("Reset to defaults.");
+        });
+
+        $("#btnPreview").addEventListener("click", () => {
+            if (dirty) {
+                CMS.save(data);
+                dirty = false;
+            }
+            window.open("index.html", "_blank");
+        });
+
+        $("#btnLogout").addEventListener("click", () => {
+            if (dirty && !confirm("You have unsaved changes. Leave anyway?")) return;
+            adminPanel.style.display = "none";
+            loginGate.style.display = "";
+            $("#loginPass").value = "";
+        });
+
+        /* ═══ PASSWORD CHANGE ═══ */
+        $("#btnChangePass").addEventListener("click", () => {
+            const old = $("#oldPass").value;
+            const np = $("#newPass").value;
+            const cp = $("#confirmPass").value;
+            if (!CMS.checkPassword(old)) { toast("Current password incorrect.", "error"); return; }
+            if (np.length < 4) { toast("New password must be at least 4 characters.", "error"); return; }
+            if (np !== cp) { toast("Passwords don't match.", "error"); return; }
+            CMS.setPassword(np);
+            $("#oldPass").value = "";
+            $("#newPass").value = "";
+            $("#confirmPass").value = "";
+            toast("Password updated!");
+        });
+
+        /* ═══ WARN ON CLOSE ═══ */
+        window.addEventListener("beforeunload", e => {
+            if (dirty) { e.preventDefault(); e.returnValue = ""; }
+        });
+    })();
+    </script>
+</body>
+</html>
