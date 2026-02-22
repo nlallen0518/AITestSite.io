@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Urban Coffee House — an immersive bean-to-cup journey.">
+    <title>Urban Coffee House — Bean to Cup</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+    <!-- Fixed cinematic layers -->
+    <canvas id="bgCanvas" aria-hidden="true"></canvas>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <!-- Cinematic letterbox bars -->
+    <div class="letterbox letterbox-top" aria-hidden="true"></div>
+    <div class="letterbox letterbox-bot" aria-hidden="true"></div>
+
+    <!-- Depth warp tunnel -->
+    <div class="warp-tunnel" id="warpTunnel" aria-hidden="true">
+        <div class="warp-ring wr-1"></div>
+        <div class="warp-ring wr-2"></div>
+        <div class="warp-ring wr-3"></div>
+        <div class="warp-ring wr-4"></div>
+    </div>
+
+    <!-- Light rays -->
+    <div class="light-rays" id="lightRays" aria-hidden="true">
+        <div class="ray ray-1"></div>
+        <div class="ray ray-2"></div>
+        <div class="ray ray-3"></div>
+    </div>
+
+    <!-- Cursor -->
+    <div class="cursor-dot" aria-hidden="true"></div>
+    <div class="cursor-aura" aria-hidden="true"></div>
+
+    <!-- Journey progress -->
+    <div class="journey-bar" aria-hidden="true">
+        <span class="journey-bar-fill" id="journeyBarFill"></span>
+    </div>
+
+    <!-- Stage nav -->
+    <nav class="stage-nav" id="stageNav">
+        <button class="stage-pip active" data-stage="0" aria-label="Origin"><span>Origin</span></button>
+        <button class="stage-pip" data-stage="1" aria-label="Roast"><span>Roast</span></button>
+        <button class="stage-pip" data-stage="2" aria-label="Grind"><span>Grind</span></button>
+        <button class="stage-pip" data-stage="3" aria-label="Extract"><span>Extract</span></button>
+        <button class="stage-pip" data-stage="4" aria-label="Pour"><span>Pour</span></button>
+        <button class="stage-pip" data-stage="5" aria-label="Atmosphere"><span>Atmosphere</span></button>
+        <button class="stage-pip" data-stage="6" aria-label="The Table"><span>The Table</span></button>
+    </nav>
+
+    <!-- Stage title flash -->
+    <div class="stage-title-flash" id="stageTitleFlash" aria-hidden="true">
+        <span class="stf-label" id="stfLabel"></span>
+    </div>
+
+    <!-- ═════════════════════ JOURNEY ═════════════════════ -->
+    <main class="journey" id="journey">
+
+        <!-- ─── S0: ORIGIN ─── -->
+        <section class="stage stage-origin" id="stage0" data-stage="0">
+            <div class="scene scene-origin" id="sceneOrigin">
+                <canvas class="mountain-canvas" id="mountainCanvas" aria-hidden="true"></canvas>
+                <canvas class="stars-canvas" id="starsCanvas" aria-hidden="true"></canvas>
+                <div class="cherry-portal" id="cherryPortal">
+                    <div class="cherry-shell cherry-l"></div>
+                    <div class="cherry-shell cherry-r"></div>
+                    <div class="cherry-bean" id="cherryBean"></div>
+                </div>
+                <div class="float-beans" id="floatBeans"></div>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block origin-hero">
+                    <p class="eyebrow gs-reveal">From the Highlands</p>
+                    <h1 class="headline-hero gs-reveal">Urban<br>Coffee<br>House</h1>
+                    <p class="body-lead gs-reveal">Every cup begins as a cherry on a branch, 1,800 meters above sea level. Scroll to follow the journey — from origin to your table.</p>
+                    <div class="scroll-cue gs-reveal">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12l7 7 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <span>Scroll to descend</span>
+                    </div>
+                </div>
+                <div class="content-block">
+                    <div class="stat-row gs-reveal">
+                        <div class="stat"><span class="stat-num" data-count="6">0</span><span class="stat-lbl">Origin Countries</span></div>
+                        <div class="stat"><span class="stat-num" data-count="14">0</span><span class="stat-lbl">Partner Farms</span></div>
+                        <div class="stat"><span class="stat-num-text">1800m+</span><span class="stat-lbl">Altitude</span></div>
+                    </div>
+                    <p class="body-text gs-reveal">We partner with farms across Ethiopia, Colombia, Guatemala, Japan, Kenya, and Brazil — paying above market, visiting annually, learning always.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S1: ROAST ─── -->
+        <section class="stage stage-roast" id="stage1" data-stage="1">
+            <div class="scene scene-roast" id="sceneRoast">
+                <div class="drum-interior" id="drumInterior">
+                    <div class="drum-ring dr-1"></div>
+                    <div class="drum-ring dr-2"></div>
+                    <div class="drum-ring dr-3"></div>
+                    <div class="drum-ring dr-4"></div>
+                    <div class="drum-ring dr-5"></div>
+                </div>
+                <div class="roast-bean" id="roastBean"></div>
+                <div class="heat-glow" id="heatGlow"></div>
+                <canvas class="heat-canvas" id="heatCanvas" aria-hidden="true"></canvas>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">Transformation</p>
+                    <h2 class="headline-lg gs-reveal">The Roast</h2>
+                    <p class="body-lead gs-reveal">You're inside the drum. At 200&deg;C, sugars caramelize, acids develop, and over 800 aromatic compounds form. Watch the bean transform — green to golden to deep espresso brown.</p>
+                </div>
+                <div class="content-block">
+                    <div class="card-row gs-stagger">
+                        <article class="glass-card"><h3>Light Roast</h3><p>Bright acidity, floral notes. Best for pour-over and filter.</p></article>
+                        <article class="glass-card"><h3>Medium Roast</h3><p>Balanced sweetness, caramel body. Our house espresso profile.</p></article>
+                        <article class="glass-card"><h3>Dark Roast</h3><p>Bold, chocolatey, low acidity. Ideal for milk drinks and cold brew.</p></article>
+                    </div>
+                    <blockquote class="quote gs-reveal">
+                        <p>"Roasting is listening. The beans crack, change color, tell you when they're ready."</p>
+                        <cite>— Alex Chen, Head Roaster</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S2: GRIND ─── -->
+        <section class="stage stage-grind" id="stage2" data-stage="2">
+            <div class="scene scene-grind" id="sceneGrind">
+                <svg class="blade-ring" id="bladeRing" viewBox="0 0 400 400" aria-hidden="true">
+                    <g id="bladeSet">
+                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)"/>
+                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(45 200 200)"/>
+                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(90 200 200)"/>
+                        <rect x="190" y="20" width="20" height="160" rx="10" fill="rgba(200,215,255,0.18)" transform="rotate(135 200 200)"/>
+                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)"/>
+                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(45 200 200)"/>
+                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(90 200 200)"/>
+                        <rect x="190" y="220" width="20" height="160" rx="10" fill="rgba(200,215,255,0.10)" transform="rotate(135 200 200)"/>
+                        <circle cx="200" cy="200" r="25" fill="none" stroke="rgba(200,215,255,0.2)" stroke-width="2.5"/>
+                    </g>
+                </svg>
+                <div class="grind-flash" id="grindFlash"></div>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">Precision</p>
+                    <h2 class="headline-lg gs-reveal">The Grind</h2>
+                    <p class="body-lead gs-reveal">The blades close in. Grind size determines everything — too coarse and water rushes through, too fine and bitterness takes over. We calibrate every morning.</p>
+                </div>
+                <div class="content-block">
+                    <div class="card-row gs-stagger">
+                        <article class="glass-card"><h3>Espresso</h3><p>Fine like powdered sugar. 9 bars pressure. 25-second pull.</p></article>
+                        <article class="glass-card"><h3>Pour Over</h3><p>Medium like sea salt. Gravity-fed. 3.5-minute bloom.</p></article>
+                        <article class="glass-card"><h3>Cold Brew</h3><p>Coarse like raw sugar. 12-hour immersion. Zero heat.</p></article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S3: EXTRACT ─── -->
+        <section class="stage stage-extract" id="stage3" data-stage="3">
+            <div class="scene scene-extract" id="sceneExtract">
+                <div class="pf-group" id="pfGroup">
+                    <div class="pf-body"></div>
+                    <div class="pf-spout"></div>
+                    <div class="pf-handle"></div>
+                </div>
+                <div class="espresso-stream" id="espressoStream"></div>
+                <div class="drip-pool" id="dripPool"></div>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">Signature Collection</p>
+                    <h2 class="headline-lg gs-reveal">The Menu</h2>
+                </div>
+                <div class="content-block">
+                    <h3 class="menu-cat gs-reveal">Drinks</h3>
+                    <div class="menu-grid" id="menuDrinks"></div>
+                </div>
+                <div class="content-block">
+                    <h3 class="menu-cat gs-reveal">Kitchen</h3>
+                    <div class="menu-grid" id="menuFood"></div>
+                    <p class="menu-note gs-reveal">Menu rotates seasonally. Ask about this week's featured single-origin.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S4: POUR ─── -->
+        <section class="stage stage-pour" id="stage4" data-stage="4">
+            <div class="scene scene-pour" id="scenePour">
+                <div class="cup-3d" id="cup3d">
+                    <div class="cup-rim"></div>
+                    <div class="cup-liquid"></div>
+                    <svg class="latte-art" id="latteArt" viewBox="0 0 200 200">
+                        <path class="rosetta" id="rosettaPath" d="
+                            M100,168 C100,168 84,152 80,138 C76,124 79,114 89,109
+                            C99,104 100,114 100,114 C100,114 101,104 111,109
+                            C121,114 124,124 120,138 C116,152 100,168 100,168Z
+                            M100,109 C100,109 88,99 85,89 C82,79 86,73 93,71
+                            C100,69 100,77 100,77 C100,77 100,69 107,71
+                            C114,73 118,79 115,89 C112,99 100,109 100,109Z
+                            M100,77 C100,77 93,69 92,61 C91,53 95,49 100,48
+                            C105,49 109,53 108,61 C107,69 100,77 100,77Z
+                            M100,48 L100,32
+                        " fill="none" stroke="rgba(255,248,235,0.8)" stroke-width="2.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <div class="milk-pour" id="milkPour"></div>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">The Craft</p>
+                    <h2 class="headline-lg gs-reveal">The Pour</h2>
+                    <p class="body-lead gs-reveal">You're looking down into the cup. The milk enters — micro-foam at exactly 60&deg;C — and the rosetta forms. It's proof this cup was made with care.</p>
+                </div>
+                <div class="content-block">
+                    <div class="card-row card-row-2 gs-stagger">
+                        <article class="glass-card"><h3>Milk Science</h3><p>Steam to 60&deg;C — the sweet spot where lactose breaks into simple sugars. Any hotter and proteins denature.</p></article>
+                        <article class="glass-card"><h3>Plant Alternatives</h3><p>Oat, almond, coconut — each steamed differently. Full micro-foam on every option.</p></article>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S5: ATMOSPHERE ─── -->
+        <section class="stage stage-atmosphere" id="stage5" data-stage="5">
+            <div class="scene scene-atmosphere" id="sceneAtmo">
+                <div class="reveal-frame" id="revealFrame">
+                    <div class="gallery-mosaic">
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=900&auto=format&fit=crop')"></div>
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?q=80&w=900&auto=format&fit=crop')"></div>
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=900&auto=format&fit=crop')"></div>
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?q=80&w=900&auto=format&fit=crop')"></div>
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?q=80&w=900&auto=format&fit=crop')"></div>
+                        <div class="mosaic-img" style="background-image:url('https://images.unsplash.com/photo-1442512595331-e89e73853f31?q=80&w=900&auto=format&fit=crop')"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">The Space</p>
+                    <h2 class="headline-lg gs-reveal">More than a caf&eacute;</h2>
+                    <p class="body-lead gs-reveal">The cup opens up and you're here — concrete floors, walnut counters, morning light flooding the bar. Every detail exists to slow you down.</p>
+                    <blockquote class="quote gs-reveal">
+                        <p>"The space was designed to feel like a pause — somewhere between a gallery and a living room."</p>
+                        <cite>— Mira Patel, Interior Architect</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── S6: THE TABLE ─── -->
+        <section class="stage stage-table" id="stage6" data-stage="6">
+            <div class="stage-content">
+                <div class="content-block">
+                    <p class="eyebrow gs-reveal">You Made It</p>
+                    <h2 class="headline-lg gs-reveal">The Table</h2>
+                    <p class="body-lead gs-reveal">From cherry to cup, you've seen every step. Now pull up a chair.</p>
+                </div>
+                <div class="content-block">
+                    <div class="table-grid gs-reveal">
+                        <div class="visit-info">
+                            <div class="info-block"><h4>Location</h4><p>48 Lexington Row, Downtown District</p></div>
+                            <div class="info-block"><h4>Contact</h4><p>+1 (415) 555-0174<br>hello@urbancoffeehouse.com</p></div>
+                            <div class="info-block"><h4>Hours</h4><p>Mon — Fri 7 AM – 10 PM<br>Sat 8 AM – 11:30 PM<br>Sun 8 AM – 9 PM</p></div>
+                        </div>
+                        <form class="reserve-form" id="reservationForm" novalidate>
+                            <h3>Reserve a table</h3>
+                            <label>Name <input type="text" name="name" required placeholder="Your name"></label>
+                            <label>Email <input type="email" name="email" required placeholder="you@email.com"></label>
+                            <label>Guests <input type="number" name="guests" min="1" max="12" required placeholder="1-12"></label>
+                            <label>Date <input type="date" name="date" required></label>
+                            <button type="submit" class="btn-reserve">Confirm Reservation</button>
+                            <p class="form-msg" id="formMessage" aria-live="polite"></p>
+                        </form>
+                    </div>
+                </div>
+                <div class="content-block">
+                    <div class="faq-row gs-stagger">
+                        <div class="glass-card faq"><h4>Walk-ins?</h4><p>Always welcome. Reservations guarantee seating during peak.</p></div>
+                        <div class="glass-card faq"><h4>Wi-Fi?</h4><p>Fast and free. Laptop-friendly after 2 PM weekdays.</p></div>
+                        <div class="glass-card faq"><h4>Beans to go?</h4><p>Every origin available in 250g bags. Ground to your method.</p></div>
+                    </div>
+                    <p class="closing gs-reveal">See you at the bar. &#10022;</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="site-footer"><span>&copy; 2026 Urban Coffee House</span></footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
